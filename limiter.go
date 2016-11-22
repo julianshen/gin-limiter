@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/juju/ratelimit"
 	"time"
+	"fmt"
 )
 
 type RateKeyFunc func(ctx *gin.Context) (string, error)
@@ -40,6 +41,9 @@ func (r *RateLimiterMiddleware) Middleware() gin.HandlerFunc {
 				err = errors.New("Too many requests")
 			}
 			ctx.AbortWithError(429, err)
+		} else {
+			ctx.Header("X-RateLimit-Remaining", fmt.Sprintf("%d", limiter.Available()))
+			ctx.Header("X-RateLimit-Limit", fmt.Sprintf("%d", limiter.Capacity()))
 		}
 	}
 }
