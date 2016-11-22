@@ -28,7 +28,7 @@ func (r *RateLimiterMiddleware) get(ctx *gin.Context) (*ratelimit.Bucket, error)
 		return limiter, nil
 	}
 
-	limiter := ratelimit.NewBucket(r.fillInterval, r.capacity)
+	limiter := ratelimit.NewBucketWithQuantum(r.fillInterval, r.capacity, r.capacity)
 	r.limiters[key] = limiter
 	return limiter, nil
 }
@@ -48,10 +48,10 @@ func (r *RateLimiterMiddleware) Middleware() gin.HandlerFunc {
 	}
 }
 
-func NewRateLimiter(fillInterval time.Duration, capacity int64, keyGen RateKeyFunc) *RateLimiterMiddleware {
+func NewRateLimiter(interval time.Duration, capacity int64, keyGen RateKeyFunc) *RateLimiterMiddleware {
 	limiters := make(map[string]*ratelimit.Bucket)
 	return &RateLimiterMiddleware{
-		fillInterval,
+		interval,
 		capacity,
 		keyGen,
 		limiters,
