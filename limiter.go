@@ -42,8 +42,9 @@ func (r *RateLimiterMiddleware) Middleware() gin.HandlerFunc {
 			}
 			ctx.AbortWithError(429, err)
 		} else {
-			ctx.Header("X-RateLimit-Remaining", fmt.Sprintf("%d", limiter.Available()))
-			ctx.Header("X-RateLimit-Limit", fmt.Sprintf("%d", limiter.Capacity()))
+			ctx.Writer.Header().Set("X-RateLimit-Remaining", fmt.Sprintf("%d", limiter.Available()))
+			ctx.Writer.Header().Set("X-RateLimit-Limit", fmt.Sprintf("%d", limiter.Capacity()))
+			ctx.Next()
 		}
 	}
 }
